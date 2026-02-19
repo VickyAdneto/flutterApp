@@ -1,0 +1,21 @@
+name: bankco_flutter_sdk
+description: Flutter mobile SDK to launch Bankco web flow with a backend-generated UID token.
+version: 1.0.0
+homepage: https://indianoil.bankco.co.in/
+publish_to: "none"
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.10.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
