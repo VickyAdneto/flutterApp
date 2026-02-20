@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   static const String _integrationUrl = 'http://indianoil.bankco.co.in/';
 
-  Future<String> _fetchUidFromBackend() async {
+  Future<String> _fetchTokenFromBackend() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     return '1111111wertwe1';
   }
@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final uid = await _fetchUidFromBackend();
+      final token = await _fetchTokenFromBackend();
       if (!mounted) {
         return;
       }
@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute<void>(
           builder: (_) => BankcoSdkScreen(
             url: _integrationUrl,
-            uid: uid,
+            token: token,
           ),
         ),
       );

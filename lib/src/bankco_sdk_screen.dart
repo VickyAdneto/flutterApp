@@ -1,22 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class BankcoSdkScreen extends StatefulWidget {
   const BankcoSdkScreen({
     super.key,
     required this.url,
-    this.uid,
-    this.tokenParamName = 'token',
-    this.title = 'Bankco',
-    this.enableWebHistoryOnBack = false,
+    required this.token,
   });
 
   final String url;
-  final String? uid;
-  final String tokenParamName;
-  final String title;
-  final bool enableWebHistoryOnBack;
+  final String token;
 
   @override
   State<BankcoSdkScreen> createState() => _BankcoSdkScreenState();
@@ -34,8 +29,7 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
 
     final initialUri = _buildUri(
       inputUrl: widget.url,
-      tokenParamName: widget.tokenParamName,
-      uid: widget.uid,
+      token: widget.token,
     );
 
     _controller = WebViewController()
@@ -45,43 +39,32 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
 
   Uri _buildUri({
     required String inputUrl,
-    required String tokenParamName,
-    required String? uid,
+    required String token,
   }) {
     final uri = Uri.parse(inputUrl);
-    if (uid == null || uid.isEmpty) {
-      return uri;
-    }
 
     final queryParams = <String, String>{
       ...uri.queryParameters,
-      tokenParamName: uid,
+      'token': token,
+      'mod': 'mobSDk',
     };
 
     return uri.replace(queryParameters: queryParams);
   }
 
   Future<void> _onBackPressed() async {
-    if (!widget.enableWebHistoryOnBack || kIsWeb) {
-      if (mounted) {
-        Navigator.of(context).maybePop();
-      }
+    if (!mounted) {
       return;
     }
 
-    final controller = _controller;
-    if (controller == null) {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
       return;
     }
 
-    final canGoBack = await controller.canGoBack();
-    if (canGoBack) {
-      await controller.goBack();
-      return;
-    }
-
-    if (mounted) {
-      Navigator.of(context).maybePop();
+    if (!kIsWeb) {
+      await SystemNavigator.pop();
     }
   }
 
@@ -101,7 +84,7 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
             onPressed: _onBackPressed,
             icon: const Icon(Icons.arrow_back),
           ),
-          title: Text(widget.title),
+          title: const Text('Bankco'),
           centerTitle: true,
         ),
         body: isWebUnsupported

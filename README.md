@@ -6,24 +6,47 @@ This SDK shows:
 - A navigation bar with a back button
 - Product name title: `Bankco`
 - An in-app WebView loading the URL provided by integrator app
-- Optional token injection (`uid` from backend) as query param
 
 ## URL behavior
 
-The integrator decides the URL at runtime:
+The integrator provides the base URL and token:
 
 ```dart
 BankcoSdkScreen(
   url: 'http://indianoil.bankco.co.in/',
-  uid: '1111111wertwe1',
+  token: 'yourBackendToken',
 )
 ```
 
+SDK automatically appends query parameters.
+
 Loaded URL becomes:
 
-`http://indianoil.bankco.co.in/?token=1111111wertwe1`
+`http://indianoil.bankco.co.in/?token=yourBackendToken&mod=sdk`
 
-If `uid` is not provided, SDK loads URL as-is.
+The `mod=sdk` parameter is automatically added by the SDK to identify mobile SDK traffic.
+
+## Integration requirements
+
+The SDK requires only two inputs from integrators:
+
+- `url`: Your web flow base URL
+- `token`: Backend-generated user/session token
+
+The SDK automatically injects these query parameters:
+
+- `token`: The token you provided
+
+Final URL format:
+
+`http://indianoil.bankco.co.in/?token=<yourtoken>&mod=sdk`
+
+## Quick integration checklist
+
+- Pass base URL in `url` (for example: `http://indianoil.bankco.co.in/`)
+- Pass backend token in `token`
+- Open `BankcoSdkScreen` using `Navigator.push`
+- If using `http`, apply Android and iOS cleartext/ATS settings below
 
 ## Install
 
@@ -50,7 +73,7 @@ import 'package:flutter/material.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  Future<String> fetchUidFromBackend() async {
+  Future<String> fetchTokenFromBackend() async {
     // Replace with your API call.
     return '1111111wertwe1';
   }
@@ -62,14 +85,14 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            final uid = await fetchUidFromBackend();
+            final token = await fetchTokenFromBackend();
             if (!context.mounted) return;
 
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => BankcoSdkScreen(
                   url: 'http://indianoil.bankco.co.in/',
-                  uid: uid,
+                  token: token,
                 ),
               ),
             );
@@ -86,31 +109,24 @@ class HomePage extends StatelessWidget {
 
 `BankcoSdkScreen` parameters:
 
-- `url` (required): URL to open in WebView (defined by integrator app)
-- `uid` (optional): Backend-generated token value to append in URL query
-- `tokenParamName` (optional): Query parameter key for token. Default `token`
-- `title` (optional): Default `Bankco`
-- `enableWebHistoryOnBack` (optional): Default `false`
+- `url` (required): Base URL to open in WebView
+- `token` (required): Backend-generated token value
 
-Example with custom values:
+The SDK automatically appends:
+- `token` as a query parameter
+
+Example:
 
 ```dart
 BankcoSdkScreen(
   url: 'https://your-domain.com/flow',
-  uid: uid,
-  tokenParamName: 'token',
-  title: 'Bankco',
-  enableWebHistoryOnBack: false,
+  token: tokenFromBackend,
 )
 ```
 
 ## Back button behavior
 
-- Default (`enableWebHistoryOnBack: false`):
-  - App bar back and device back close SDK screen and return to host app page.
-- Optional (`enableWebHistoryOnBack: true`):
-  - If WebView has history: goes to previous web page.
-  - Else: closes SDK screen and returns to host app page.
+- App bar back and device back close SDK screen and return to host app page.
 
 ## How other Flutter apps can integrate this SDK
 
@@ -124,7 +140,7 @@ dependencies:
       ref: main
 ```
 
-2. Get URL and `uid` from host app/backend as per business flow.
+2. Get `url` and `token` from host app/backend as per business flow.
 3. Open SDK screen from any Flutter page:
 
 ```dart
@@ -132,8 +148,7 @@ Navigator.of(context).push(
   MaterialPageRoute<void>(
     builder: (_) => BankcoSdkScreen(
       url: urlFromIntegrator,
-      uid: uidFromBackend,
-      enableWebHistoryOnBack: false,
+      token: tokenFromBackend,
     ),
   ),
 );
