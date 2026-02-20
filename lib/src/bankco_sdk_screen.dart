@@ -57,12 +57,23 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
       return;
     }
 
+    // Check if WebView has history to go back
+    if (!kIsWeb && _controller != null) {
+      final canGoBack = await _controller!.canGoBack();
+      if (canGoBack) {
+        await _controller!.goBack();
+        return;
+      }
+    }
+
+    // No WebView history, exit the SDK screen
     final navigator = Navigator.of(context);
     if (navigator.canPop()) {
       navigator.pop();
       return;
     }
 
+    // Last resort: exit Flutter app
     if (!kIsWeb) {
       await SystemNavigator.pop();
     }

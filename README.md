@@ -126,7 +126,12 @@ BankcoSdkScreen(
 
 ## Back button behavior
 
-- App bar back and device back close SDK screen and return to host app page.
+Both the AppBar back button and device back button:
+
+1. **First**: Navigate back through WebView history (if available)
+2. **Then**: Exit SDK screen and return to host app when no more WebView history exists
+
+This provides a natural browsing experience within the SDK.
 
 ## How other Flutter apps can integrate this SDK
 
