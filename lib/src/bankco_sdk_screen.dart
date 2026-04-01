@@ -8,10 +8,12 @@ class BankcoSdkScreen extends StatefulWidget {
     super.key,
     required this.url,
     required this.token,
+    this.cardId,
   });
 
   final String url;
   final String token;
+  final String? cardId;
 
   @override
   State<BankcoSdkScreen> createState() => _BankcoSdkScreenState();
@@ -30,6 +32,7 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
     final initialUri = _buildUri(
       inputUrl: widget.url,
       token: widget.token,
+      cardId: widget.cardId,
     );
 
     _controller = WebViewController()
@@ -40,6 +43,7 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
   Uri _buildUri({
     required String inputUrl,
     required String token,
+    String? cardId,
   }) {
     final uri = Uri.parse(inputUrl);
 
@@ -48,6 +52,10 @@ class _BankcoSdkScreenState extends State<BankcoSdkScreen> {
       'token': token,
       'mod': 'mobSDk',
     };
+
+    if (cardId != null && cardId.isNotEmpty) {
+      queryParams['card_id'] = cardId;
+    }
 
     return uri.replace(queryParameters: queryParams);
   }

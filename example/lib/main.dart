@@ -39,6 +39,11 @@ class _HomePageState extends State<HomePage> {
     return '1111111wertwe1';
   }
 
+  Future<String> _fetchCardIdFromBackend() async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    return 'card_123';
+  }
+
   Future<void> _openBankcoSdk() async {
     setState(() {
       _isLoading = true;
@@ -46,6 +51,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       final token = await _fetchTokenFromBackend();
+      final cardId = await _fetchCardIdFromBackend();
       if (!mounted) {
         return;
       }
@@ -55,6 +61,7 @@ class _HomePageState extends State<HomePage> {
           builder: (_) => BankcoSdkScreen(
             url: _integrationUrl,
             token: token,
+            cardId: cardId,
           ),
         ),
       );

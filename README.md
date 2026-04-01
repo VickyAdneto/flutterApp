@@ -9,12 +9,13 @@ This SDK shows:
 
 ## URL behavior
 
-The integrator provides the base URL and token:
+The integrator provides the base URL and token, and can optionally provide a card ID:
 
 ```dart
 BankcoSdkScreen(
   url: 'http://indianoil.bankco.co.in/',
   token: 'yourBackendToken',
+  cardId: 'yourCardId',
 )
 ```
 
@@ -22,29 +23,32 @@ SDK automatically appends query parameters.
 
 Loaded URL becomes:
 
-`http://indianoil.bankco.co.in/?token=yourBackendToken&mod=sdk`
+`http://indianoil.bankco.co.in/?token=yourBackendToken&card_id=yourCardId&mod=sdk`
 
 The `mod=sdk` parameter is automatically added by the SDK to identify mobile SDK traffic.
 
 ## Integration requirements
 
-The SDK requires only two inputs from integrators:
+The SDK requires two mandatory inputs from integrators:
 
 - `url`: Your web flow base URL
 - `token`: Backend-generated user/session token
+- `cardId` (optional): Card identifier sent as `card_id`
 
 The SDK automatically injects these query parameters:
 
 - `token`: The token you provided
+- `card_id`: The card ID you provided, when `cardId` is passed
 
 Final URL format:
 
-`http://indianoil.bankco.co.in/?token=<yourtoken>&mod=sdk`
+`http://indianoil.bankco.co.in/?token=<yourtoken>&card_id=<yourCardId>&mod=sdk`
 
 ## Quick integration checklist
 
 - Pass base URL in `url` (for example: `http://indianoil.bankco.co.in/`)
 - Pass backend token in `token`
+- Pass card identifier in `cardId` when available
 - Open `BankcoSdkScreen` using `Navigator.push`
 - If using `http`, apply Android and iOS cleartext/ATS settings below
 
@@ -86,6 +90,7 @@ class HomePage extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () async {
             final token = await fetchTokenFromBackend();
+            const cardId = 'card_123';
             if (!context.mounted) return;
 
             Navigator.of(context).push(
@@ -93,6 +98,7 @@ class HomePage extends StatelessWidget {
                 builder: (_) => BankcoSdkScreen(
                   url: 'http://indianoil.bankco.co.in/',
                   token: token,
+                  cardId: cardId,
                 ),
               ),
             );
@@ -111,9 +117,11 @@ class HomePage extends StatelessWidget {
 
 - `url` (required): Base URL to open in WebView
 - `token` (required): Backend-generated token value
+- `cardId` (optional): Card identifier value
 
 The SDK automatically appends:
 - `token` as a query parameter
+- `card_id` as a query parameter when `cardId` is provided
 
 Example:
 
@@ -121,6 +129,7 @@ Example:
 BankcoSdkScreen(
   url: 'https://your-domain.com/flow',
   token: tokenFromBackend,
+  cardId: cardIdFromBackend,
 )
 ```
 
@@ -145,7 +154,7 @@ dependencies:
       ref: main
 ```
 
-2. Get `url` and `token` from host app/backend as per business flow.
+2. Get `url` and `token` from host app/backend as per business flow, and pass `cardId` if available.
 3. Open SDK screen from any Flutter page:
 
 ```dart
@@ -154,6 +163,7 @@ Navigator.of(context).push(
     builder: (_) => BankcoSdkScreen(
       url: urlFromIntegrator,
       token: tokenFromBackend,
+      cardId: cardIdFromBackend,
     ),
   ),
 );
